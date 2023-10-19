@@ -30,16 +30,16 @@ function blogs_action()
   $category = $_POST['category'];
   $type = $_POST['type'];
   $order = $_POST['order'];
-  $page=$_POST['page'];
+  $page = $_POST['page'];
   $args = array(
     'post_type' => 'blogs',
     'posts_per_page' => 10, // Show all posts
-    'paged' =>$page,
+    'paged' => $page,
   );
 
-  if(!empty($order)){
+  if (!empty($order)) {
     $args['meta_key'] = 'date_published';
-    $args['order_by'] ='meta_value';
+    $args['order_by'] = 'meta_value';
     $args['order'] = $order;
   }
   // check if filters is not empty 
@@ -100,34 +100,35 @@ function blogs_shortcode()
   $args = array(
     'post_type' => 'blogs',
     'posts_per_page' => 10, // Show all posts
-    'paged' =>get_query_var('paged') ? get_query_var('paged') : 1, //
+    'paged' => get_query_var('paged') ? get_query_var('paged') : 1, //
   );
-  wp_enqueue_style('GhiCardsStyles', '/wp-content/plugins/ghi-publications/style.css');
+  wp_enqueue_style('GhiCardsStyles', '/wp-content/plugins/ghi-blogs/style.css');
   echo '<section id="publication-section" class="mt-5">';
-  $html= blogs_cards($args);
+  $html = blogs_cards($args);
   echo $html['html'];
   echo '</section>';
   // import jQuery script
   echo '<span id="loader" class="loader"></span>';
-  if($html['max_page_number']>1){
-  echo '<div>';
-  echo '<button class="block mt-3 mx-auto text-[11px] bg-[transparent] p-[4px_16px] font-[500] mt-[14px] rounded-[4px] uppercase border-[1px] border-solid border-[#860334] text-[#860334] transition-all duration-500 hover:bg-[#860334] hover:text-white" id="load-more-button">Load More</button>';
-  echo '</div>';}
+  if ($html['max_page_number'] > 1) {
+    echo '<div>';
+    echo '<button class="block mt-3 mx-auto text-[11px] bg-[transparent] p-[4px_16px] font-[500] mt-[14px] rounded-[4px] uppercase border-[1px] border-solid border-[#860334] text-[#860334] transition-all duration-500 hover:bg-[#860334] hover:text-white" id="load-more-button">Load More</button>';
+    echo '</div>';
+  }
   echo '<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>';
 }
 
 function blogs_cards($args)
 {
   $custom_query = new WP_Query($args);
-  $response['max_page_number']=$custom_query->max_num_pages;
-  $response['html']="";
-  $first_post=true; 
-  if ($custom_query->have_posts()) : $response['html'].='
+  $response['max_page_number'] = $custom_query->max_num_pages;
+  $response['html'] = "";
+  $first_post = true;
+  if ($custom_query->have_posts()) : $response['html'] .= '
     <div class="container mx-auto">
-    <div id="card_container" class="flex justify-center flex-wrap gap-4">';
+    <div id="card_container" class="flex justify-center flex-wrap gap-[40px]">';
     while ($custom_query->have_posts()) : $custom_query->the_post();
 
-    $response['html'].= ' <div class="card relative flex flex-col justify-center p-[28px] bg-[#FFF] border border-[#eee] w-[300px] min-h-[450px] text-[12px] shadow-[#00000019_0px_20px_25px_-5px,#0000_0px_10px_10px_-5px] transition-all hover:scale-[1.02] hover:shadow-2xl rounded-[7px]">
+      $response['html'] .= ' <div class="card relative flex flex-col justify-center p-[15px] bg-[#FFF] border border-[#eee] w-[300px] min-h-[450px] text-[12px] shadow-[#00000019_0px_20px_25px_-5px,#0000_0px_10px_10px_-5px] transition-all hover:scale-[1.02] hover:shadow-2xl rounded-[7px]">
         <div class="absolute -top-[15px] right-[5px] bg-[#860334] text-white z-30 p-[5px_10px] rounded-[4px]">
           Latest
         </div>
@@ -137,7 +138,7 @@ function blogs_cards($args)
             <img
               class="h-[158px] w-full bg-cover rounded-[3px]"
               alt=""
-              src="'.get_the_post_thumbnail_url(get_the_ID(),).'"
+              src="' . get_the_post_thumbnail_url(get_the_ID(),) . '"
             />
           </div>
           <div class="flex flex-col bg-[#FFF]">
@@ -161,23 +162,23 @@ function blogs_cards($args)
                   <span class="text-xs">'  . get_post_meta(get_the_ID(), 'authors', true) . '</span>
             </div>
             <div
-                  class="flex items-center  mb-2 last:mb-0 gap-2 overflow-ellipsis w-60 whitespace-nowrap overflow-hidden"
+                  class="read-more-content"
                 > 
-                '.get_the_content().'
+                ' . get_the_content() . '
             </div>
             </div>
           </div>
           <div class="h-[30px] flex items-center text-[10px]">
             <span>active 15 days ago</span>
           </div>
-          <a target="_blank" href="'.get_permalink(get_the_ID()).'" class="bg-[#092140] text-[white] text-[9px] border=[transparent] font-semibold tracking-[0.5px] uppercase padding-[5px_13px] rounded-[6px]">
+          <a target="_blank" href="' . get_permalink(get_the_ID()) . '" class="bg-[#092140] text-[white] text-center text-[9px] border-[transparent] font-semibold tracking-[0.5px] uppercase padding-[5px_13px] rounded-[6px] hover:text-[white] active:text-[white] focus:text-[white] mt-[auto]">
             Read more
           </a>
         </div>
       </div>';
 
     endwhile;
-    $response['html'].='</div>
+    $response['html'] .= '</div>
       </div>';
   endif;
   return $response;
