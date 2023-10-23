@@ -74,23 +74,26 @@ function blogs_shortcode()
   $counter = 0;
 
   /* start filter section */
-  echo '<div class="flex flex-col sm:flex-row justify-center gap-[8px] ">';
-  
+  echo '<div class="flex flex-col justify-start items-start">';
+
   foreach ($group_fields as $field) {
     $field_name = $field['name'];
     if ($field_name == 'keywords') {
       $counter++;
-      echo   "<fieldset>
-      <legend>Filters</legend>
-      <div>";
+      echo   "
+      <h3 class='mb-[8px] text-[17px] tracking-[0.1px] leading-[14px]'>Filter</h3>
+      <div class='filter-wrapper overflow-auto'>";
       foreach ($field['choices'] as $key => $choise) {
-        echo'<input type="checkbox" id="'.$choise.'" name="'.$choise.'" />
-        <label for="'.$choise.'">'.$choise.'</label>';
+        echo '<div class="checkbox-wrapper">';
+        echo '<input type="checkbox" id="' . $choise . '" name="' . $choise . '" />
+        <label for="' . $choise . '">' . $choise . '</label>';
+        echo '</div>';
       }
-      echo '</div></fieldset>';
+      echo '</div>';
     }
   }
-  echo '<select id="select_3">
+
+  echo '<select id="select_3" class="mt-[32px] bg-[#860334] text-[white] p-[6px_50px] text-[12px] font-semibold">
         <option value="">Sort Results By</option>
         <option value="DESC">Latest</option>
         <option value="ASC">Oldest</option>
@@ -132,16 +135,15 @@ function blogs_cards($args)
     while ($custom_query->have_posts()) : $custom_query->the_post();
 
       $response['html'] .= ' <div class="card relative flex flex-col justify-center p-[15px] bg-[#FFF] border border-[#eee] w-[300px] min-h-[450px] text-[12px] shadow-[#00000019_0px_20px_25px_-5px,#0000_0px_10px_10px_-5px] transition-all hover:scale-[1.02] hover:shadow-2xl rounded-[7px]">';
-        if($first_post )
-        {
-         $text='Latest</div>'; 
-         $response['html'].='<div class="absolute -top-[15px] right-[5px] bg-[#860334] text-white z-30 p-[5px_10px] rounded-[4px]">';
-          if(isset($args['order']) && $args['order'] == 'ASC')
-            $text='Oldest</div>';
-         $response['html'].=$text;
-         $first_post=false;     
-        }
-        $response['html'].='<div class="lines"></div>
+      if ($first_post) {
+        $text = 'Latest</div>';
+        $response['html'] .= '<div class="absolute -top-[15px] right-[5px] bg-[#860334] text-white z-30 p-[5px_10px] rounded-[4px]">';
+        if (isset($args['order']) && $args['order'] == 'ASC')
+          $text = 'Oldest</div>';
+        $response['html'] .= $text;
+        $first_post = false;
+      }
+      $response['html'] .= '<div class="lines"></div>
         <div class="content flex flex-col h-[100%]">
           <div class="mt-[10px]">
             <img
