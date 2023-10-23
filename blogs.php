@@ -68,29 +68,32 @@ function blogs_action()
 function blogs_shortcode()
 {
 
-  $fields = get_post_type_object('publication');
-  $group_fields_id = acf_get_field_groups(array('post_type' => 'publication'))[0]['key'];
+  $fields = get_post_type_object('blogs');
+  $group_fields_id = acf_get_field_groups(array('post_type' => 'blogs'))[0]['key'];
   $group_fields = acf_get_fields($group_fields_id);
   $counter = 0;
 
   /* start filter section */
   echo '<div class="flex flex-col sm:flex-row justify-center gap-[8px] ">';
+  
   foreach ($group_fields as $field) {
     $field_name = $field['name'];
-    if ($field_name == 'category' || $field_name == 'type') {
+    if ($field_name == 'keywords') {
       $counter++;
-      echo   '<select id="select_' . $counter . '" name="' . $field_name . '_filter">
-    <option value="">Select ' . $field_name . '</option>';
+      echo   "<fieldset>
+      <legend>Filters</legend>
+      <div>";
       foreach ($field['choices'] as $key => $choise) {
-        echo '<option value="' . $choise . '">' . $choise . '</option>';
+        echo'<input type="checkbox" id="'.$choise.'" name="'.$choise.'" />
+        <label for="'.$choise.'">'.$choise.'</label>';
       }
-      echo '</select>';
+      echo '</div></fieldset>';
     }
   }
   echo '<select id="select_3">
         <option value="">Sort Results By</option>
-        <option value="DESC">Newest</option>
-        <option value="ASC">Latest</option>
+        <option value="DESC">Latest</option>
+        <option value="ASC">Oldest</option>
         </select>';
   echo '</div>';
   /* end filter section */
@@ -128,11 +131,17 @@ function blogs_cards($args)
     <div id="card_container" class="flex justify-center flex-wrap gap-[40px]">';
     while ($custom_query->have_posts()) : $custom_query->the_post();
 
-      $response['html'] .= ' <div class="card relative flex flex-col justify-center p-[15px] bg-[#FFF] border border-[#eee] w-[300px] min-h-[450px] text-[12px] shadow-[#00000019_0px_20px_25px_-5px,#0000_0px_10px_10px_-5px] transition-all hover:scale-[1.02] hover:shadow-2xl rounded-[7px]">
-        <div class="absolute -top-[15px] right-[5px] bg-[#860334] text-white z-30 p-[5px_10px] rounded-[4px]">
-          Latest
-        </div>
-        <div class="lines"></div>
+      $response['html'] .= ' <div class="card relative flex flex-col justify-center p-[15px] bg-[#FFF] border border-[#eee] w-[300px] min-h-[450px] text-[12px] shadow-[#00000019_0px_20px_25px_-5px,#0000_0px_10px_10px_-5px] transition-all hover:scale-[1.02] hover:shadow-2xl rounded-[7px]">';
+        if($first_post )
+        {
+         $text='Latest</div>'; 
+         $response['html'].='<div class="absolute -top-[15px] right-[5px] bg-[#860334] text-white z-30 p-[5px_10px] rounded-[4px]">';
+          if(isset($args['order']) && $args['order'] == 'ASC')
+            $text='Oldest</div>';
+         $response['html'].=$text;
+         $first_post=false;     
+        }
+        $response['html'].='<div class="lines"></div>
         <div class="content flex flex-col h-[100%]">
           <div class="mt-[10px]">
             <img
