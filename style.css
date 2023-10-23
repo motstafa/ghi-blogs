@@ -57,19 +57,22 @@ a:target{
     overflow: hidden;
 }
 
+fieldset{
+  overflow: auto;
+}
+
+.filter-wrapper {
+  height: 200px;
+  width: 186px;
+}
+
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+}
+
 p,
 label {
-  font:
-    1rem 'Fira Sans',
-    sans-serif;
-}
-
-input {
-  margin: 0.4rem;
-}
-
-fieldset{
-  width: 163px;
-  height: 90px;
-  overflow: auto;
+    font-size: 12px !important;
+    font-weight: 600;
 }
