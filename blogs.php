@@ -27,10 +27,13 @@ add_action('wp_ajax_nopriv_my_action', 'blogs_action');
 // Same handler function...
 function blogs_action()
 {
-  $category = $_POST['category'];
-  $type = $_POST['type'];
+  $jsonString = stripslashes($_POST['filters']);
+  $filters = json_decode($jsonString, true);
   $order = $_POST['order'];
   $page = $_POST['page'];
+
+  $meta_query = array('relation' => 'OR');
+
   $args = array(
     'post_type' => 'blogs',
     'posts_per_page' => 10, // Show all posts
@@ -43,25 +46,20 @@ function blogs_action()
     $args['order'] = $order;
   }
   // check if filters is not empty 
-  if (!empty($category) || !empty($type)) {
-    $relation = 'AND';
-    if (empty($category) || empty($type))
-      $relation = 'OR';
-    $args['meta_query'] = array(
-      'relation' => $relation, // You can use 'OR' if needed
-      array(
-        'key' => 'category',
-        'value' => $category,
-        'compare' => '='
-      ),
-      array(
-        'key' => 'type',
-        'value' => $type,
-        'compare' => '='
-      )
-    );
+  if (!empty($filters)) {
+
+    foreach($filters as $key=>$value)
+    {
+      $meta_query[] = array(
+        'key'     => 'keywords',
+        'value'   => $value,
+        'compare' => 'LIKE',
+      );
+    }
+    $args['meta_query'] =$meta_query;
   }
   wp_send_json(blogs_cards($args));
+  // wp_send_json();
   wp_die();
 }
 
@@ -82,7 +80,7 @@ function blogs_shortcode()
       $counter++;
       echo   "
       <h3 class='mb-[8px] text-[17px] tracking-[0.1px] leading-[14px]'>Filter</h3>
-      <div class='filter-wrapper overflow-auto'>";
+      <div id='checkbox_filter' class='filter-wrapper overflow-auto'>";
       foreach ($field['choices'] as $key => $choise) {
         echo '<div class="checkbox-wrapper">';
         echo '<input type="checkbox" id="' . $choise . '" name="' . $choise . '" />
@@ -106,10 +104,11 @@ function blogs_shortcode()
   $args = array(
     'post_type' => 'blogs',
     'posts_per_page' => 10, // Show all posts
-    'paged' => get_query_var('paged') ? get_query_var('paged') : 1, //
-  );
+    'paged' => get_query_var('paged') ? get_query_var('paged') : 1, //    
+    );
+
   wp_enqueue_style('GhiCardsStyles', '/wp-content/plugins/ghi-blogs/style.css');
-  echo '<section id="publication-section" class="mt-5">';
+  echo '<section id="blogs-section" class="mt-5">';
   $html = blogs_cards($args);
   echo $html['html'];
   echo '</section>';

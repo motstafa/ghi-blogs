@@ -3,8 +3,9 @@ $(document).ready(function() {
 
     var page = 2;
     var counter = 2;
+    const selectedOptions = [];
     // Function to handle AJAX request
-    function makeAjaxRequest(typeFilter,categoryFilter,dateFilter,load_more) {
+    function makeAjaxRequest(dateFilter,load_more) {
 
         if(!load_more){ 
           page = 1;
@@ -12,8 +13,7 @@ $(document).ready(function() {
         }
         var data = {
             'action': 'my_action',
-            'type':typeFilter,
-            'category':categoryFilter,
+            'filters': JSON.stringify(selectedOptions),
             'order':dateFilter,
             'page':page
         };
@@ -34,9 +34,8 @@ $(document).ready(function() {
     
     }
 
-    
     function updatePageContent(data,load_more) {
-        const contentDiv = document.getElementById("publication-section");       
+        const contentDiv = document.getElementById("blogs-section");       
     if(load_more)
       $('#card_container').append(data);
     else
@@ -46,25 +45,46 @@ $(document).ready(function() {
 
 
     // Event handlers for select boxes
-    $('#select_1, #select_2, #select_3').change(function() {
-        const typeFilter = document.getElementById("select_1").value;
-        const categoryFilter = document.getElementById("select_2").value;
+    $('#select_3').change(function() {
         const dateFilter = document.getElementById("select_3").value;
+        makeAjaxRequest(dateFilter,false);
+    });
 
-        makeAjaxRequest(typeFilter, categoryFilter, dateFilter,false);
 
+    // Get all your checkboxes (replace 'input[type="checkbox"]' with a more specific selector)
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+    // Attach change event listener to each checkbox
+    checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function() {
+    if (this.checked) {
+        // If checkbox is checked, add its value to the array
+        selectedOptions.push(this.id);
+        const dateFilter = document.getElementById("select_3").value;
+        makeAjaxRequest(dateFilter,false);        
+    } else {
+        // If checkbox is unchecked, remove its value from the array
+        const index = selectedOptions.indexOf(this.id);
+        if (index !== -1) {
+        selectedOptions.splice(index, 1);
+        const dateFilter = document.getElementById("select_3").value;
+        makeAjaxRequest(dateFilter,false);        
+        }
+    }
+
+    // Debug: Print the current array
+    console.log(myArray);
+    });
     });
 
 
     // Load more posts
     document.getElementById('load-more-button').addEventListener('click', function () {
-        const typeFilter = document.getElementById("select_1").value;
-        const categoryFilter = document.getElementById("select_2").value;
         const dateFilter = document.getElementById("select_3").value;
         load_more=true;
         document.getElementById('loader').style.display="block";
         document.getElementById('load-more-button').style.display="none";
-        makeAjaxRequest(typeFilter, categoryFilter, dateFilter,load_more);      
+        makeAjaxRequest(dateFilter,load_more);      
     });
 });
 
