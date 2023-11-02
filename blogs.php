@@ -48,15 +48,14 @@ function blogs_action()
   // check if filters is not empty 
   if (!empty($filters)) {
 
-    foreach($filters as $key=>$value)
-    {
+    foreach ($filters as $key => $value) {
       $meta_query[] = array(
         'key'     => 'keywords',
         'value'   => $value,
         'compare' => 'LIKE',
       );
     }
-    $args['meta_query'] =$meta_query;
+    $args['meta_query'] = $meta_query;
   }
   wp_send_json(blogs_cards($args));
   // wp_send_json();
@@ -71,6 +70,9 @@ function blogs_shortcode()
   $group_fields = acf_get_fields($group_fields_id);
   $counter = 0;
 
+  /* start filter + blogs cards section */
+  echo "<div class='blogs flex'>";
+
   /* start filter section */
   echo '<div class="flex flex-col justify-start items-start">';
 
@@ -79,7 +81,7 @@ function blogs_shortcode()
     if ($field_name == 'keywords') {
       $counter++;
       echo   "
-      <h3 class='mb-[8px] text-[17px] tracking-[0.1px] leading-[14px]'>Filter</h3>
+      <h3 class='mb-[15px] text-[17px] tracking-[0.1px] leading-[14px]'>Filter</h3>
       <div id='checkbox_filter' class='filter-wrapper overflow-auto'>";
       foreach ($field['choices'] as $key => $choise) {
         echo '<div class="checkbox-wrapper">';
@@ -99,21 +101,22 @@ function blogs_shortcode()
   echo '</div>';
   /* end filter section */
 
-  /* end filter section */
-
   $args = array(
     'post_type' => 'blogs',
     'posts_per_page' => 10, // Show all posts
     'paged' => get_query_var('paged') ? get_query_var('paged') : 1, //    
-    );
+  );
 
   wp_enqueue_style('GhiCardsStyles', '/wp-content/plugins/ghi-blogs/style.css');
-  echo '<section id="blogs-section" class="mt-5">';
+  echo '<section id="blogs-section">';
   $html = blogs_cards($args);
   echo $html['html'];
   echo '</section>';
   // import jQuery script
   echo '<span id="loader" class="loader"></span>';
+
+  echo "</div>";
+
   if ($html['max_page_number'] > 1) {
     echo '<div>';
     echo '<button class="block mt-3 mx-auto text-[11px] bg-[transparent] p-[4px_16px] font-[500] mt-[14px] rounded-[4px] uppercase border-[1px] border-solid border-[#860334] text-[#860334] transition-all duration-500 hover:bg-[#860334] hover:text-white" id="load-more-button">Load More</button>';
@@ -130,10 +133,10 @@ function blogs_cards($args)
   $first_post = true;
   if ($custom_query->have_posts()) : $response['html'] .= '
     <div class="container mx-auto">
-    <div id="card_container" class="flex justify-center flex-wrap gap-[40px]">';
+    <div id="card_container" class="flex justify-center flex-wrap gap-[30px]">';
     while ($custom_query->have_posts()) : $custom_query->the_post();
 
-      $response['html'] .= ' <div class="card relative flex flex-col justify-center p-[15px] bg-[#FFF] border border-[#eee] w-[300px] min-h-[450px] text-[12px] shadow-[#00000019_0px_20px_25px_-5px,#0000_0px_10px_10px_-5px] transition-all hover:scale-[1.02] hover:shadow-2xl rounded-[7px]">';
+      $response['html'] .= ' <div class="card relative flex flex-col justify-center p-[15px] bg-[#FFF] border border-[#eee] w-[262px] min-h-[450px] text-[12px] shadow-[#00000019_0px_20px_25px_-5px,#0000_0px_10px_10px_-5px] transition-all hover:scale-[1.02] hover:shadow-2xl rounded-[7px]">';
       if ($first_post) {
         $text = 'Latest</div>';
         $response['html'] .= '<div class="absolute -top-[15px] right-[5px] bg-[#860334] text-white z-30 p-[5px_10px] rounded-[4px]">';
@@ -189,11 +192,10 @@ function blogs_cards($args)
 
     endwhile;
     $response['html'] .= '</div>
-      </div>';
+      </>';
   endif;
   return $response;
 }
-
 
 
 add_shortcode('blogs-cards', 'blogs_shortcode');
